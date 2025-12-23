@@ -9,8 +9,7 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         #header { width: 100%; background: var(--primary); color: white; padding: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); position: sticky; top: 0; display: flex; justify-content: space-around; align-items: center; z-index: 100; }
         .container { width: 90%; max-width: 850px; margin-top: 30px; padding-bottom: 50px; }
-        .card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: none; border-top: 8px solid var(--secondary); }
-        .card.active { display: block; animation: slideIn 0.4s ease-out; }
+        .card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 8px solid var(--secondary); display: block; animation: slideIn 0.4s ease-out; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
         h2 { color: var(--primary); margin-top: 0; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #eee; padding-bottom: 10px;}
         .category-badge { font-size: 0.5em; background: var(--gold); color: #000; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; }
@@ -34,9 +33,9 @@
 <div id="header">
     <div style="display: flex; flex-direction: column; align-items: center;">
         <div id="progress-bar-container" style="width: 250px; height: 12px; background: #444; border-radius: 6px; overflow: hidden; margin-bottom: 5px;">
-            <div id="progress-bar" style="width: 2.5%; height: 100%; background: var(--gold); transition: 0.4s;"></div>
+            <div id="progress-bar" style="width: 0%; height: 100%; background: var(--gold); transition: 0.4s;"></div>
         </div>
-        <small>Progress: <span id="current-num">1</span> / 40</small>
+        <small>Progress: <span id="current-num">0</span> / 40</small>
     </div>
     <div style="text-align: center;">
         <div style="font-size: 1.2em; font-weight: bold;">Score: <span id="score">0</span></div>
@@ -45,324 +44,84 @@
 </div>
 
 <div class="container" id="container">
+    <div class="card" id="start-screen" style="text-align: center;">
+        <h1>Disease Detectives Case Files</h1>
+        <p>You are joining Dr. Maggie and Dr. Kangin to investigate 40 critical outbreaks. Solve each case using your epidemiological toolkit.</p>
+        <p><strong>Rules:</strong> Round all ratios to 2 decimal places. Provide percentages as whole numbers or decimals (e.g., 90.50).</p>
+        <button class="btn-submit" onclick="startApp()" style="font-size: 1.4em; padding: 20px 50px;">Begin Shift &rarr;</button>
     </div>
+</div>
 
 <script>
 const problems = [
-    // --- SECTION 1: RR & OR (10 Problems) ---
-    { 
-        id: 1, cat: "RR", title: "The Sparkle Emoji Scourge", 
-        scenario: "Dr. Maggie is investigating a localized outbreak of 'Emoji Fever' at a digital marketing firm. She hypothesizes that the heavy use of 'Sparkle Emojis' in client emails leads to immediate cognitive fatigue. She conducts a cohort study of 350 staff members. Out of the 215 employees who admitted to using the sparkle emoji at least 50 times a day (Exposed), 64 reported symptoms of the fever. Among the remaining 135 employees who strictly used plain text (Unexposed), only 18 reported symptoms. To analyze the strength of this association, Dr. Maggie needs the Relative Risk.", 
-        q: "Calculate the Relative Risk (RR) rounded to 2 decimal places.", 
-        ans: 2.23, 
-        explain: "ARe = 64/215 (0.2977); ARu = 18/135 (0.1333). RR = 0.2977 / 0.1333 = 2.23." 
-    },
-    { 
-        id: 2, cat: "OR", title: "The Snapchat Syndrome", 
-        scenario: "During a city-wide investigation into 'Snapchat Syndrome,' Dr. Alyssa performs a case-control study. She gathers a total of 556 participants. Within the group, 280 individuals were identified as heavy users of the 'Dog Filter' (Exposed), and of these, 105 were diagnosed as cases (affected). In the group of 276 individuals who never used the filter (Unexposed), only 31 were diagnosed as cases. Dr. Alyssa wants to calculate the odds of being affected based on this exposure.", 
-        q: "Calculate the Odds Ratio (OR) rounded to 2 decimal places.", 
-        ans: 4.75, 
-        explain: "OR = (ad)/(bc) = (105 * 245) / (175 * 31) = 25725 / 5425 = 4.741." 
-    },
-    { 
-        id: 3, cat: "RR", title: "The Zoomitis Pandemic", 
-        scenario: "Dr. Maggie is tracking a strange condition called 'Zoomitis' among remote workers. She follows 490 office workers over a month. She finds that 210 workers spent more than 6 hours a day on camera (Exposed), resulting in 74 individuals developing Zoomitis (affected). Meanwhile, 280 workers who kept their cameras off (Unexposed) had only 16 individuals develop the condition. She needs to determine the risk ratio for the on-camera group.", 
-        q: "Calculate the Relative Risk (RR) rounded to 2 decimal places.", 
-        ans: 6.17, 
-        explain: "ARe = 74/210 (0.3524); ARu = 16/280 (0.0571). RR = 0.3524 / 0.0571 = 6.17." 
-    },
-    { 
-        id: 4, cat: "OR", title: "The Hashtag Hiccups", 
-        scenario: "Dr. Kangin is looking at a bizarre rash of hiccups linked to social media tagging. He samples 354 individuals. He finds 120 'Heavy Taggers' (Exposed) and discovers that 23 of them have the hiccups (affected). In the control group of 234 'Lurkers' who never tag (Unexposed), 18 individuals have the hiccups. Because this is a case-control sample, he needs the Odds Ratio.", 
-        q: "Calculate the Odds Ratio (OR) rounded to 2 decimal places.", 
-        ans: 2.85, 
-        explain: "OR = (23 * 216) / (97 * 18) = 4968 / 1746 = 2.85." 
-    },
-    { 
-        id: 5, cat: "RR", title: "Meme convention Madness", 
-        scenario: "At a national meme convention, Dr. Grace investigates a foodborne illness. She identifies 242 attendees. She finds that 90 people ate the 'Doge-Toast' (Exposed), of which 39 became ill (affected). The other 152 people ate 'Grumpy-Granola' (Unexposed), and 16 of them became ill. She needs the relative risk of the Doge-Toast.", 
-        q: "Calculate the Relative Risk (RR) rounded to 2 decimal places.", 
-        ans: 4.12, 
-        explain: "ARe = 39/90 (0.433); ARu = 16/152 (0.105). RR = 4.12." 
-    },
-    { 
-        id: 6, cat: "RR", title: "The Filter Flu", 
-        scenario: "In a high school, Dr. Grace finds that students using 'Beauty Filters' on every post seem to develop a specific type of social anxiety known as Filter Flu. Among 150 students who use filters daily (Exposed), 49 have Filter Flu. Among 228 students who use 'Natural Mode' (Unexposed), only 5 have the flu. She wants to see how much the risk increases for filter users.", 
-        q: "Calculate the Relative Risk (RR) rounded to 2 decimal places.", 
-        ans: 14.90, 
-        explain: "ARe = 49/150 (0.3267); ARu = 5/228 (0.0219). RR = 14.90." 
-    },
-    { 
-        id: 7, cat: "OR", title: "The Selfie Syndrome", 
-        scenario: "Dr. Alyssa tracks 404 tourists at the Grand Canyon. She identifies 250 tourists who took more than 20 selfies a day (Exposed), and 64 of them reported severe wrist pain (affected). Among the 154 tourists who only took scenery photos (Unexposed), 50 reported wrist pain. She needs the Odds Ratio for selfie-taking.", 
-        q: "Calculate the Odds Ratio (OR) rounded to 2 decimal places.", 
-        ans: 0.72, 
-        explain: "OR = (64 * 104) / (186 * 50) = 6656 / 9300 = 0.72." 
-    },
-    { 
-        id: 8, cat: "RR", title: "The GIF-itis Gloom", 
-        scenario: "Dr. Maggie studies a group of 482 internet users. She finds 300 users who primarily communicate via GIFs (Exposed), and 104 of them report 'Short Attention Span Syndrome' (affected). In the group of 182 users who only use long-form text (Unexposed), 55 report the same syndrome. She needs the relative risk for the GIF-exposed group.", 
-        q: "Calculate the Relative Risk (RR) rounded to 2 decimal places.", 
-        ans: 1.15, 
-        explain: "ARe = 104/300 (0.3467); ARu = 55/182 (0.3022). RR = 1.147 (1.15)." 
-    },
-    { 
-        id: 9, cat: "OR", title: "The Reel Rash", 
-        scenario: "Dr. Maggie investigates 'Reel Rash' at a college. Among 572 students, 400 watch 'Reels' for 3+ hours (Exposed), with 57 showing the rash (affected). In the group of 172 who only watch long-form YouTube (Unexposed), 42 have the rash. She calculates the odds ratio.", 
-        q: "Calculate the Odds Ratio (OR) rounded to 2 decimal places.", 
-        ans: 0.52, 
-        explain: "OR = (57 * 130) / (343 * 42) = 7410 / 14406 = 0.514 (0.52)." 
-    },
-    { 
-        id: 10, cat: "RR", title: "Story Spots", 
-        scenario: "Dr. Kangin studies 472 social media users. 200 users primarily post 'Stories' (Exposed), and 108 of them developed 'Red Eye' (affected). 272 users only post static images (Unexposed), and 59 developed the condition. He needs the relative risk.", 
-        q: "Calculate the Relative Risk (RR) rounded to 2 decimal places.", 
-        ans: 2.49, 
-        explain: "ARe = 108/200 (0.54); ARu = 59/272 (0.2169). RR = 2.489 (2.49)." 
-    },
-
-    // --- SECTION 2: Sensitivity & Specificity (10 Problems) ---
-    { 
-        id: 11, cat: "SENS", title: "Comment Cough Screening", 
-        scenario: "Dr. Kangin is validating a new rapid test for 'Comment Cough'. He has a population of 600 people. According to the gold-standard biopsy, 120 truly have the disease (Affected) and 480 are healthy (Unaffected). His new rapid test correctly identifies 105 of the sick people as positive, but it also incorrectly labels 60 healthy people as positive. He needs to know how good the test is at catching the sick.", 
-        q: "Calculate the Sensitivity of the test.", 
-        ans: 0.88, 
-        explain: "Sensitivity = True Positives / Total Diseased = 105 / 120 = 0.875 (0.88)." 
-    },
-    { 
-        id: 12, cat: "SPEC", title: "Like-itis Verification", 
-        scenario: "In a test for 'Like-itis' involving 330 participants, Dr. Maggie knows that 100 people truly have the condition. The test returns a positive result for 90 of the sick people. However, out of the 230 healthy people, the test incorrectly flags 40 of them as positive. She needs the specificity to understand the test's ability to identify healthy individuals.", 
-        q: "Calculate the Specificity of the test.", 
-        ans: 0.83, 
-        explain: "Specificity = True Negatives / Total Healthy = (230 - 40) / 230 = 190 / 230 = 0.826." 
-    },
-    { 
-        id: 13, cat: "PPV", title: "Viral Vibes Predictive Value", 
-        scenario: "Dr. Grace tests 264 people for 'Viral Vibes'. 119 people are truly sick, and 145 are healthy. The test results show 112 sick people tested positive and 43 healthy people also tested positive. Dr. Grace wants to know: if a patient tests positive, what is the probability they actually have the disease?", 
-        q: "Calculate the Positive Predictive Value (PPV).", 
-        ans: 0.72, 
-        explain: "PPV = True Positives / Total Test Positives = 112 / (112 + 43) = 112 / 155 = 0.722." 
-    },
-    { 
-        id: 14, cat: "NPV", title: "The Stream Sneeze Assurance", 
-        scenario: "A population of 315 is tested for 'Stream Sneeze'. 146 are truly sick and 169 are healthy. The test correctly identifies 117 sick people (positive) and 137 healthy people (negative). Dr. Kangin needs to know: if a person tests negative, how likely is it that they are truly healthy?", 
-        q: "Calculate the Negative Predictive Value (NPV).", 
-        ans: 0.83, 
-        explain: "NPV = TN / (TN + FN) = 137 / (137 + (146 - 117)) = 137 / (137 + 29) = 0.825." 
-    },
-    { 
-        id: 15, cat: "SPEC", title: "Ping Pox Precision", 
-        scenario: "Dr. Alyssa tests 256 people for 'Ping Pox'. There are 80 truly sick people and 176 healthy people. The test identifies 70 of the sick people as positive and 47 of the healthy people as positive. She needs to calculate the specificity.", 
-        q: "Calculate the Specificity of the test.", 
-        ans: 0.73, 
-        explain: "Spec = (176 - 47) / 176 = 129 / 176 = 0.7329." 
-    },
-    { 
-        id: 16, cat: "SENS", title: "Cloudy Brain Sensitivity", 
-        scenario: "Dr. Grace develops a scan for 'Cloudy Brain'. Among 319 patients, 120 are confirmed sick and 199 are healthy. The scan is positive for 96 sick patients and 36 healthy patients. She needs the sensitivity.", 
-        q: "Calculate the Sensitivity.", 
-        ans: 0.80, 
-        explain: "Sens = 96 / 120 = 0.80." 
-    },
-    { 
-        id: 17, cat: "PPV", title: "Pixel Pox Rapid Test", 
-        scenario: "In a group of 237 people, 84 have 'Pixel Pox'. A rapid test gives a positive result to 50 of those sick people and 31 of the healthy people. Calculate the PPV.", 
-        q: "Calculate the Positive Predictive Value (PPV).", 
-        ans: 0.62, 
-        explain: "PPV = 50 / (50 + 31) = 50 / 81 = 0.617." 
-    },
-    { 
-        id: 18, cat: "NPV", title: "Trend Tingles Probability", 
-        scenario: "293 people are checked for 'Trend Tingles'. 142 are confirmed sick and 151 are healthy. The test finds 111 sick people positive and 130 healthy people negative. What is the NPV?", 
-        q: "Calculate the Negative Predictive Value (NPV).", 
-        ans: 0.81, 
-        explain: "NPV = 130 / (130 + (142 - 111)) = 130 / 161 = 0.807." 
-    },
-    { 
-        id: 19, cat: "SPEC", title: "Inbox Infection Specificity", 
-        scenario: "Dr. Maggie tests 222 people for 'Inbox Infection'. 82 are truly sick and 140 are healthy. The test is positive for 66 sick people and 38 healthy people. She needs the specificity.", 
-        q: "Calculate the Specificity.", 
-        ans: 0.73, 
-        explain: "Spec = (140 - 38) / 140 = 102 / 140 = 0.728." 
-    },
-    { 
-        id: 20, cat: "SENS", title: "The Final Filter Test", 
-        scenario: "In a clinical trial of 100 people, 50 have 'Filter Flu'. A high-precision test catches 48 of the cases and identifies 48 of the healthy people as negative. Calculate the sensitivity.", 
-        q: "Calculate the Sensitivity.", 
-        ans: 0.96, 
-        explain: "Sens = 48 / 50 = 0.96." 
-    },
-
-    // --- SECTION 3: Vaccine Efficacy (10 Problems) ---
-    { 
-        id: 21, cat: "VE", title: "Vaxitis-A Protection", 
-        scenario: "Dr. Aarav is conducting a trial for the 'Vaxitis-A' vaccine. He monitors 2,000 people. 1,500 people chose to be vaccinated (Exposed to vaccine), and over the season, 15 of them got sick. In the unvaccinated group of 500 people (Unexposed), 80 people got sick. He needs to calculate how effective the vaccine was at preventing the illness.", 
-        q: "Calculate Vaccine Efficacy (VE) as a percentage (number only).", 
-        ans: 93.75, 
-        explain: "ARv = 15/1500 = 0.01; ARu = 80/500 = 0.16. VE = ((0.16 - 0.01) / 0.16) * 100 = 93.75%." 
-    },
-    { 
-        id: 22, cat: "VE", title: "Vaxitis-2 Clinical Trial", 
-        scenario: "In a study of 798 people, Dr. Maggie splits them evenly. 399 are vaccinated and 399 are not. At the end of the year, 7 vaccinated people are sick, while 138 unvaccinated people are sick. She needs the efficacy.", 
-        q: "Calculate Vaccine Efficacy (VE) as a percentage.", 
-        ans: 94.93, 
-        explain: "ARv = 7/399 = 0.0175; ARu = 138/399 = 0.3459. VE = ((0.3459 - 0.0175) / 0.3459) * 100 = 94.93%." 
-    },
-    { 
-        id: 23, cat: "VE", title: "Vaxitis-3 Evaluation", 
-        scenario: "Dr. Grace studies 444 individuals. 222 are vaccinated (9 sick) and 222 are unvaccinated (55 sick). Calculate the percentage reduction in disease among the vaccinated.", 
-        q: "Calculate Vaccine Efficacy (VE) as a percentage.", 
-        ans: 83.64, 
-        explain: "ARv = 9/222 = 0.0405; ARu = 55/222 = 0.2477. VE = 83.64%." 
-    },
-    { 
-        id: 24, cat: "VE", title: "The Vaxitis-B Barrier", 
-        scenario: "In a town of 1,400 people, 1,000 are vaccinated (20 sick) and 400 are unvaccinated (60 sick). Dr. Kangin calculates the vaccine efficacy.", 
-        q: "Calculate Vaccine Efficacy (VE) as a percentage.", 
-        ans: 86.67, 
-        explain: "ARv = 0.02; ARu = 0.15. VE = ((0.15 - 0.02) / 0.15) * 100 = 86.67%." 
-    },
-    { 
-        id: 25, cat: "VE", title: "Vaxitis-C Defense", 
-        scenario: "Dr. Maggie studies a small group: 500 vaccinated (5 sick) and 100 unvaccinated (10 sick). What is the efficacy?", 
-        q: "Calculate Vaccine Efficacy (VE) as a percentage.", 
-        ans: 90.00, 
-        explain: "ARv = 0.01; ARu = 0.10. VE = (0.09 / 0.10) * 100 = 90%." 
-    },
-    { 
-        id: 26, cat: "VE", title: "Vaxitis-D Impact", 
-        scenario: "A school has 800 vaccinated kids (16 ill) and 200 unvaccinated kids (40 ill). Dr. Grace needs the VE.", 
-        q: "Calculate Vaccine Efficacy (VE) as a percentage.", 
-        ans: 90.00, 
-        explain: "ARv = 0.02; ARu = 0.20. VE = 90%." 
-    },
-    { 
-        id: 27, cat: "VE", title: "Vaxitis-E Results", 
-        scenario: "600 vaccinated (12 sick) vs 150 unvaccinated (30 sick). What is the efficacy?", 
-        q: "Calculate Vaccine Efficacy (VE) as a percentage.", 
-        ans: 90.00, 
-        explain: "ARv = 0.02; ARu = 0.20. VE = 90%." 
-    },
-    { 
-        id: 28, cat: "VE", title: "Vaxitis-F Failure Analysis", 
-        scenario: "In a heavy outbreak: 1,200 vaccinated (36 sick) and 400 unvaccinated (48 sick). Calculate VE.", 
-        q: "Calculate Vaccine Efficacy (VE) as a percentage.", 
-        ans: 75.00, 
-        explain: "ARv = 0.03; ARu = 0.12. VE = (0.09 / 0.12) * 100 = 75%." 
-    },
-    { 
-        id: 29, cat: "VE", title: "Vaxitis-G Strength", 
-        scenario: "900 vaccinated (9 sick) and 300 unvaccinated (45 sick). What is the efficacy?", 
-        q: "Calculate Vaccine Efficacy (VE) as a percentage.", 
-        ans: 93.33, 
-        explain: "ARv = 0.01; ARu = 0.15. VE = 93.33%." 
-    },
-    { 
-        id: 30, cat: "VE", title: "Vaxitis-H Final Study", 
-        scenario: "750 vaccinated (15 sick) and 250 unvaccinated (50 sick). Calculate VE.", 
-        q: "Calculate Vaccine Efficacy (VE) as a percentage.", 
-        ans: 90.00, 
-        explain: "ARv = 0.02; ARu = 0.20. VE = 90%." 
-    },
-
-    // --- SECTION 4: Herd Immunity (5 Problems) ---
-    { 
-        id: 31, cat: "HIT", title: "The Herditis-X Limit", 
-        scenario: "Dr. Maggie is planning a public health response for 'Herditis-X'. The pathogen is highly infectious with a basic reproduction number (R0) of 6.5. She needs to calculate the minimum percentage of the population that must be immune to stop the spread.", 
-        q: "Calculate the Herd Immunity Threshold (HIT) as a percentage.", 
-        ans: 84.62, 
-        explain: "HIT = 1 - (1 / R0) = 1 - (1 / 6.5) = 1 - 0.1538 = 0.8462 (84.62%)." 
-    },
-    { 
-        id: 32, cat: "HIT", title: "Herditis-1 Threshold", 
-        scenario: "A new virus, Herditis-1, enters a city. It has an R0 of 3. What percentage of the population needs to be vaccinated?", 
-        q: "Calculate the Herd Immunity Threshold (HIT) as a percentage.", 
-        ans: 66.67, 
-        explain: "HIT = 1 - (1/3) = 0.6667." 
-    },
-    { 
-        id: 33, cat: "HIT", title: "Herditis-2 Requirement", 
-        scenario: "For the less-contagious Herditis-2 with an R0 of 2, calculate the threshold.", 
-        q: "Calculate the Herd Immunity Threshold (HIT) as a percentage.", 
-        ans: 50.00, 
-        explain: "HIT = 1 - (1/2) = 0.50." 
-    },
-    { 
-        id: 34, cat: "HIT", title: "Measles Surge Comparison", 
-        scenario: "Measles is extremely contagious with an R0 of 18. Dr. Alyssa needs the HIT for the town hall meeting.", 
-        q: "Calculate the Herd Immunity Threshold (HIT) as a percentage.", 
-        ans: 94.44, 
-        explain: "HIT = 1 - (1/18) = 0.9444." 
-    },
-    { 
-        id: 35, cat: "HIT", title: "Seasonal Flu Calculation", 
-        scenario: "A mild seasonal flu strain has an R0 of 1.3. What is the required immunity level?", 
-        q: "Calculate the Herd Immunity Threshold (HIT) as a percentage.", 
-        ans: 23.08, 
-        explain: "HIT = 1 - (1/1.3) = 0.2308." 
-    },
-
-    // --- SECTION 5: Likelihood Ratios (5 Problems) ---
-    { 
-        id: 36, cat: "LR", title: "Test Alpha Performance", 
-        scenario: "Dr. Maggie is assessing 'Test Alpha' for a rare condition. The test has a sensitivity of 0.92 and a specificity of 0.78. She wants to know the Positive Likelihood Ratio (LR+) to see how much a positive result increases the odds of disease.", 
-        q: "Calculate the Positive Likelihood Ratio (LR+).", 
-        ans: 4.18, 
-        explain: "LR+ = Sensitivity / (1 - Specificity) = 0.92 / (1 - 0.78) = 0.92 / 0.22 = 4.18." 
-    },
-    { 
-        id: 37, cat: "LR", title: "LRitis Positive Ratio", 
-        scenario: "A diagnostic test for 'LRitis' has Sensitivity = 0.81 and Specificity = 0.75. Calculate the LR+.", 
-        q: "Calculate the Positive Likelihood Ratio (LR+).", 
-        ans: 3.24, 
-        explain: "LR+ = 0.81 / 0.25 = 3.24." 
-    },
-    { 
-        id: 38, cat: "LR", title: "LRitis Negative Ratio", 
-        scenario: "Using the same test (Sens: 0.81, Spec: 0.75), Dr. Maggie now needs the Negative Likelihood Ratio (LR-).", 
-        q: "Calculate the Negative Likelihood Ratio (LR-).", 
-        ans: 0.25, 
-        explain: "LR- = (1 - Sensitivity) / Specificity = (1 - 0.81) / 0.75 = 0.19 / 0.75 = 0.253." 
-    },
-    { 
-        id: 39, cat: "LR", title: "Test Beta Efficiency", 
-        scenario: "A test for 'Beta-Virus' has Sensitivity = 0.95 and Specificity = 0.60. Calculate the LR+.", 
-        q: "Calculate the Positive Likelihood Ratio (LR+).", 
-        ans: 2.38, 
-        explain: "LR+ = 0.95 / (1 - 0.60) = 0.95 / 0.40 = 2.375." 
-    },
-    { 
-        id: 40, cat: "LR", title: "Test Beta Ruling Out", 
-        scenario: "For 'Test Beta' (Sens: 0.95, Spec: 0.60), calculate the LR- to see how effectively it rules out the disease.", 
-        q: "Calculate the Negative Likelihood Ratio (LR-).", 
-        ans: 0.08, 
-        explain: "LR- = (1 - 0.95) / 0.60 = 0.05 / 0.60 = 0.083." 
-    }
+    { id: 1, cat: "RR", title: "The Sparkle Emoji Scourge", scenario: "Dr. Maggie is investigating a localized outbreak of 'Emoji Fever' at a digital marketing firm. She hypothesizes that heavy use of 'Sparkle Emojis' in emails leads to cognitive fatigue. Among 215 staff who use the sparkle emoji daily (Exposed), 64 reported symptoms. Among 135 staff who use plain text (Unexposed), 18 reported symptoms.", q: "Calculate the Relative Risk (RR).", ans: 2.23, explain: "ARe = 64/215 (0.2977); ARu = 18/135 (0.1333). RR = 0.2977 / 0.1333 = 2.23." },
+    { id: 2, cat: "OR", title: "The Snapchat Syndrome", scenario: "During a city-wide investigation into 'Snapchat Syndrome,' Dr. Alyssa performs a study. Of 280 individuals identified as heavy users of the 'Dog Filter' (Exposed), 105 were diagnosed as cases. In the group of 276 individuals who never used the filter (Unexposed), 31 were cases. Controls (well) are those who didn't get sick in each group.", q: "Calculate the Odds Ratio (OR).", ans: 4.75, explain: "OR = (ad)/(bc) = (105 * 245) / (175 * 31) = 4.741." },
+    { id: 3, cat: "RR", title: "The Zoomitis Pandemic", scenario: "Dr. Maggie tracks 'Zoomitis' among 490 workers. 210 workers spent more than 6 hours on camera (Exposed), resulting in 74 cases. 280 workers kept their cameras off (Unexposed), resulting in 16 cases.", q: "Calculate the Relative Risk (RR).", ans: 6.17, explain: "ARe = 74/210 (0.3524); ARu = 16/280 (0.0571). RR = 6.17." },
+    { id: 4, cat: "OR", title: "The Hashtag Hiccups", scenario: "Dr. Kangin samples 354 individuals. He finds 120 'Heavy Taggers' (Exposed) and 23 of them have the hiccups (cases). In the group of 234 'Lurkers' (Unexposed), 18 individuals have the hiccups.", q: "Calculate the Odds Ratio (OR).", ans: 2.85, explain: "OR = (23 * 216) / (97 * 18) = 2.85." },
+    { id: 5, cat: "RR", title: "Meme Convention Madness", scenario: "At a meme convention of 242 attendees, 90 people ate 'Doge-Toast' (Exposed) and 39 became ill. 152 people ate 'Grumpy-Granola' (Unexposed) and 16 became ill.", q: "Calculate the Relative Risk (RR).", ans: 4.12, explain: "ARe = 39/90 (0.433); ARu = 16/152 (0.105). RR = 4.12." },
+    { id: 6, cat: "RR", title: "The Filter Flu", scenario: "Among 150 students using filters daily (Exposed), 49 have Filter Flu. Among 228 students who use 'Natural Mode' (Unexposed), only 5 have the flu.", q: "Calculate the Relative Risk (RR).", ans: 14.90, explain: "ARe = 49/150 (0.3267); ARu = 5/228 (0.0219). RR = 14.90." },
+    { id: 7, cat: "OR", title: "The Selfie Syndrome", scenario: "Dr. Alyssa tracks 404 tourists. 250 tourists took more than 20 selfies a day (Exposed), and 64 reported wrist pain. Among 154 who only took scenery photos (Unexposed), 50 reported wrist pain.", q: "Calculate the Odds Ratio (OR).", ans: 0.72, explain: "OR = (64 * 104) / (186 * 50) = 0.72." },
+    { id: 8, cat: "RR", title: "The GIF-itis Gloom", scenario: "Among 482 users, 300 primarily communicate via GIFs (Exposed), and 104 report attention span issues. Among 182 who use long-form text (Unexposed), 55 report the same issue.", q: "Calculate the Relative Risk (RR).", ans: 1.15, explain: "ARe = 104/300 (0.3467); ARu = 55/182 (0.3022). RR = 1.15." },
+    { id: 9, cat: "OR", title: "The Reel Rash", scenario: "Among 572 students, 400 watch Reels 3+ hours (Exposed), with 57 showing a rash. In the group of 172 who watch long-form YouTube (Unexposed), 42 have the rash.", q: "Calculate the Odds Ratio (OR).", ans: 0.52, explain: "OR = (57 * 130) / (343 * 42) = 0.52." },
+    { id: 10, cat: "RR", title: "Story Spots", scenario: "Dr. Kangin studies 472 users. 200 users primarily post 'Stories' (Exposed), and 108 developed Red Eye. 272 users post static images (Unexposed), and 59 developed the condition.", q: "Calculate the Relative Risk (RR).", ans: 2.49, explain: "ARe = 108/200 (0.54); ARu = 59/272 (0.2169). RR = 2.49." },
+    { id: 11, cat: "SENS", title: "Comment Cough Screening", scenario: "Dr. Kangin tests 600 people. 120 truly have the disease (Affected). His test correctly identifies 105 of them as positive.", q: "Calculate the Sensitivity of the test.", ans: 0.88, explain: "Sens = 105 / 120 = 0.875." },
+    { id: 12, cat: "SPEC", title: "Like-itis Verification", scenario: "Out of 330 participants, 230 are truly healthy. The test correctly identifies 190 of those healthy people as negative.", q: "Calculate the Specificity of the test.", ans: 0.83, explain: "Spec = 190 / 230 = 0.826." },
+    { id: 13, cat: "PPV", title: "Viral Vibes Predictive Value", scenario: "Dr. Grace tests 264 people. 112 sick people test positive, and 43 healthy people also test positive.", q: "Calculate the Positive Predictive Value (PPV).", ans: 0.72, explain: "PPV = 112 / (112 + 43) = 0.722." },
+    { id: 14, cat: "NPV", title: "The Stream Sneeze Assurance", scenario: "Out of 315 people, 137 are truly healthy and test negative. 29 are truly sick but test negative.", q: "Calculate the Negative Predictive Value (NPV).", ans: 0.83, explain: "NPV = 137 / (137 + 29) = 0.825." },
+    { id: 15, cat: "SPEC", title: "Ping Pox Precision", scenario: "176 healthy people are tested. 129 test negative correctly. 47 test positive incorrectly.", q: "Calculate the Specificity of the test.", ans: 0.73, explain: "Spec = 129 / 176 = 0.7329." },
+    { id: 16, cat: "SENS", title: "Cloudy Brain Sensitivity", scenario: "120 confirmed sick patients are scanned. The scan is positive for 96 of them.", q: "Calculate the Sensitivity.", ans: 0.80, explain: "Sens = 96 / 120 = 0.80." },
+    { id: 17, cat: "PPV", title: "Pixel Pox Rapid Test", scenario: "50 sick people test positive. 31 healthy people also test positive. What is the predictive power of a positive?", q: "Calculate the PPV.", ans: 0.62, explain: "PPV = 50 / (50 + 31) = 0.617." },
+    { id: 18, cat: "NPV", title: "Trend Tingles Probability", scenario: "130 healthy people test negative. 31 sick people test negative. If you test negative, how likely are you to be healthy?", q: "Calculate the NPV.", ans: 0.81, explain: "NPV = 130 / (130 + 31) = 0.807." },
+    { id: 19, cat: "SPEC", title: "Inbox Infection Specificity", scenario: "140 truly healthy people are tested. 102 test negative correctly.", q: "Calculate the Specificity.", ans: 0.73, explain: "Spec = 102 / 140 = 0.728." },
+    { id: 20, cat: "SENS", title: "The Final Filter Test", scenario: "In a group of 50 confirmed Filter Flu cases, the test correctly catches 48.", q: "Calculate the Sensitivity.", ans: 0.96, explain: "Sens = 48 / 50 = 0.96." },
+    { id: 21, cat: "VE", title: "Vaxitis-A Protection", scenario: "Vaccinated: 1500 people, 15 sick. Unvaccinated: 500 people, 80 sick.", q: "Calculate Vaccine Efficacy (VE) %.", ans: 93.75, explain: "ARv=0.01; ARu=0.16. VE = ((0.16-0.01)/0.16) * 100." },
+    { id: 22, cat: "VE", title: "Vaxitis-2 Trial", scenario: "Vaccinated: 399 people, 7 sick. Unvaccinated: 399 people, 138 sick.", q: "Calculate Vaccine Efficacy (VE) %.", ans: 94.93, explain: "VE = ((0.3459-0.0175)/0.3459) * 100 = 94.93." },
+    { id: 23, cat: "VE", title: "Vaxitis-3 Evaluation", scenario: "Vaccinated: 222 people, 9 sick. Unvaccinated: 222 people, 55 sick.", q: "Calculate Vaccine Efficacy (VE) %.", ans: 83.64, explain: "ARv=0.0405; ARu=0.2477. VE=83.64." },
+    { id: 24, cat: "VE", title: "Vaxitis-B Barrier", scenario: "Vaccinated: 1000, 20 sick. Unvaccinated: 400, 60 sick.", q: "Calculate Vaccine Efficacy (VE) %.", ans: 86.67, explain: "ARv=0.02; ARu=0.15. VE=86.67." },
+    { id: 25, cat: "VE", title: "Vaxitis-C Defense", scenario: "Vaccinated: 500, 5 sick. Unvaccinated: 100, 10 sick.", q: "Calculate Vaccine Efficacy (VE) %.", ans: 90.00, explain: "ARv=0.01; ARu=0.10. VE=90%." },
+    { id: 26, cat: "VE", title: "Vaxitis-D Impact", scenario: "Vaccinated: 800, 16 sick. Unvaccinated: 200, 40 sick.", q: "Calculate Vaccine Efficacy (VE) %.", ans: 90.00, explain: "ARv=0.02; ARu=0.20. VE=90%." },
+    { id: 27, cat: "VE", title: "Vaxitis-E Results", scenario: "Vaccinated: 600, 12 sick. Unvaccinated: 150, 30 sick.", q: "Calculate Vaccine Efficacy (VE) %.", ans: 90.00, explain: "VE=90%." },
+    { id: 28, cat: "VE", title: "Vaxitis-F Trial", scenario: "Vaccinated: 1200, 36 sick. Unvaccinated: 400, 48 sick.", q: "Calculate Vaccine Efficacy (VE) %.", ans: 75.00, explain: "ARv=0.03; ARu=0.12. VE=75%." },
+    { id: 29, cat: "VE", title: "Vaxitis-G Strength", scenario: "Vaccinated: 900, 9 sick. Unvaccinated: 300, 45 sick.", q: "Calculate Vaccine Efficacy (VE) %.", ans: 93.33, explain: "VE=93.33%." },
+    { id: 30, cat: "VE", title: "Vaxitis-H Study", scenario: "Vaccinated: 750, 15 sick. Unvaccinated: 250, 50 sick.", q: "Calculate Vaccine Efficacy (VE) %.", ans: 90.00, explain: "VE=90%." },
+    { id: 31, cat: "HIT", title: "Herditis-X Limit", scenario: "A pathogen has a basic reproduction number (R0) of 6.5.", q: "Calculate the Herd Immunity Threshold (HIT) %.", ans: 84.62, explain: "HIT = 1 - (1/6.5) = 84.62%." },
+    { id: 32, cat: "HIT", title: "Herditis-1 Threshold", scenario: "A virus has an R0 of 3.", q: "Calculate the HIT %.", ans: 66.67, explain: "HIT = 1 - (1/3) = 66.67%." },
+    { id: 33, cat: "HIT", title: "Herditis-2 Requirement", scenario: "A virus has an R0 of 2.", q: "Calculate the HIT %.", ans: 50.00, explain: "HIT = 1 - (1/2) = 50.00%." },
+    { id: 34, cat: "HIT", title: "Measles Surge", scenario: "Measles has an R0 of 18.", q: "Calculate the HIT %.", ans: 94.44, explain: "HIT = 1 - (1/18) = 94.44%." },
+    { id: 35, cat: "HIT", title: "Seasonal Flu", scenario: "Seasonal flu strain has an R0 of 1.3.", q: "Calculate the HIT %.", ans: 23.08, explain: "HIT = 1 - (1/1.3) = 23.08%." },
+    { id: 36, cat: "LR", title: "Test Alpha Positive", scenario: "Test has Sensitivity: 0.92 and Specificity: 0.78.", q: "Calculate the Positive Likelihood Ratio (LR+).", ans: 4.18, explain: "LR+ = 0.92 / (1 - 0.78) = 4.18." },
+    { id: 37, cat: "LR", title: "LRitis Lab", scenario: "Sensitivity: 0.81 and Specificity: 0.75.", q: "Calculate the Positive Likelihood Ratio (LR+).", ans: 3.24, explain: "LR+ = 0.81 / 0.25 = 3.24." },
+    { id: 38, cat: "LR", title: "LRitis Negative", scenario: "Sensitivity: 0.81 and Specificity: 0.75.", q: "Calculate the Negative Likelihood Ratio (LR-).", ans: 0.25, explain: "LR- = (1 - 0.81) / 0.75 = 0.253." },
+    { id: 39, cat: "LR", title: "Test Beta Plus", scenario: "Sensitivity: 0.95 and Specificity: 0.60.", q: "Calculate the Positive Likelihood Ratio (LR+).", ans: 2.38, explain: "LR+ = 0.95 / 0.40 = 2.375." },
+    { id: 40, cat: "LR", title: "Test Beta Minus", scenario: "Sensitivity: 0.95 and Specificity: 0.60.", q: "Calculate the Negative Likelihood Ratio (LR-).", ans: 0.08, explain: "LR- = (1 - 0.95) / 0.60 = 0.083." }
 ];
 
 let score = 0;
 let attempted = 0;
 let currentIdx = 0;
 
-const container = document.getElementById('container');
+function startApp() {
+    renderProblem(0);
+}
 
 function renderProblem(idx) {
     const p = problems[idx];
-    const card = document.createElement('div');
-    card.className = `card active`;
-    card.innerHTML = `
-        <h2><span class="category-badge">${p.cat}</span> Case ${p.id}: ${p.title}</h2>
-        <div class="scenario">${p.scenario}</div>
-        <p class="question-text">${p.q}</p>
-        <div class="input-area">
-            <input type="number" step="0.01" id="ans-${p.id}" placeholder="0.00" onkeydown="if(event.key==='Enter') check(${p.id}, ${p.ans}, '${p.explain}')">
-            <button class="btn-submit" id="submit-${p.id}" onclick="check(${p.id}, ${p.ans}, '${p.explain}')">Submit Findings</button>
-            <button class="btn-next" id="next-${p.id}" onclick="nextCase()">Next Case &rarr;</button>
+    const container = document.getElementById('container');
+    container.innerHTML = `
+        <div class="card active">
+            <h2><span class="category-badge">${p.cat}</span> Case ${p.id}: ${p.title}</h2>
+            <div class="scenario">${p.scenario}</div>
+            <p class="question-text">${p.q}</p>
+            <div class="input-area">
+                <input type="number" step="0.01" id="ans-${p.id}" placeholder="0.00" onkeydown="if(event.key==='Enter') check(${p.id}, ${p.ans}, '${p.explain}')">
+                <button class="btn-submit" id="submit-${p.id}" onclick="check(${p.id}, ${p.ans}, '${p.explain}')">Submit Findings</button>
+                <button class="btn-next" id="next-${p.id}" onclick="nextCase()">Next Case &rarr;</button>
+            </div>
+            <div id="feed-${p.id}" class="feedback"></div>
         </div>
-        <div id="feed-${p.id}" class="feedback"></div>
     `;
-    container.innerHTML = '';
-    container.appendChild(card);
+    document.getElementById('current-num').innerText = idx + 1;
+    document.getElementById('progress-bar').style.width = ((idx + 1) / 40 * 100) + '%';
     document.getElementById(`ans-${p.id}`).focus();
 }
 
@@ -378,14 +137,13 @@ function check(id, correct, explain) {
     attempted++;
     feed.style.display = 'block';
     
-    // Tolerance of 0.02 for rounding
     if (Math.abs(userVal - correct) < 0.021) {
         score++;
         feed.className = 'feedback correct';
-        feed.innerHTML = `<strong>INVESTIGATION SUCCESSFUL.</strong> Your calculations are precise. <span class="math-block">Explanation: ${explain}</span>`;
+        feed.innerHTML = `<strong>SUCCESS.</strong> Case solved accurately. <span class="math-block">Explanation: ${explain}</span>`;
     } else {
         feed.className = 'feedback incorrect';
-        feed.innerHTML = `<strong>INVESTIGATION FAILED.</strong> The lead was lost. Expected answer: ${correct}. <span class="math-block">Explanation: ${explain}</span>`;
+        feed.innerHTML = `<strong>ERROR.</strong> Investigation stalled. Correct answer: ${correct}. <span class="math-block">Explanation: ${explain}</span>`;
     }
 
     submitBtn.disabled = true;
@@ -398,8 +156,6 @@ function nextCase() {
     currentIdx++;
     if (currentIdx < problems.length) {
         renderProblem(currentIdx);
-        document.getElementById('current-num').innerText = currentIdx + 1;
-        document.getElementById('progress-bar').style.width = ((currentIdx + 1) / 40 * 100) + '%';
     } else {
         showFinal();
     }
@@ -411,5 +167,21 @@ function updateHeader() {
 }
 
 function showFinal() {
+    const container = document.getElementById('container');
     container.innerHTML = `
-        <div class="card active" style="text-align:center; border-top: 8px solid var(--
+        <div class="card active" style="text-align:center; border-top: 8px solid var(--gold);">
+            <h2>Investigation Complete!</h2>
+            <div style="font-size: 4em; margin: 20px 0;">🕵️‍♂️</div>
+            <p style="font-size:1.2em;">Shift complete. 40 cases handled.</p>
+            <div style="background:#eee; padding:20px; border-radius:10px; margin:20px 0;">
+                <h3 style="margin:0;">Final Score: ${score} / 40</h3>
+                <p style="margin:5px 0;">Accuracy Rate: ${((score / attempted) * 100).toFixed(1)}%</p>
+            </div>
+            <button class="btn-submit" onclick="location.reload()" style="width:100%;">Restart New Shift</button>
+        </div>
+    `;
+}
+</script>
+
+</body>
+</html>
